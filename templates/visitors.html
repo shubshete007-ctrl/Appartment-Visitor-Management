@@ -1,0 +1,110 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header-row">
+  <div>
+    <h2 class="section-title">Visitors</h2>
+    <p class="hint-text">Track everyone entering and exiting Skyline Heights.</p>
+  </div>
+  <button class="btn-primary" data-open-modal="addVisitorModal">
+    <span class="material-icons-outlined btn-icon">add</span>
+    Add visitor
+  </button>
+</div>
+
+<div class="table-card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Visitor</th>
+        <th>Flat</th>
+        <th>Phone</th>
+        <th>Purpose</th>
+        <th>Check-in</th>
+        <th>Check-out</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if visitors %}
+        {% for v in visitors %}
+          <tr>
+            <td>{{ v["id"] }}</td>
+            <td>{{ v["name"] }}</td>
+            <td>{{ v["flat_no"] }}</td>
+            <td>{{ v["phone"] or "-" }}</td>
+            <td>{{ v["purpose"] or "-" }}</td>
+            <td>{{ v["check_in"] }}</td>
+            <td>{{ v["check_out"] or "-" }}</td>
+            <td>
+              {% if not v["check_out"] %}
+                <form method="POST" action="{{ url_for('checkout_visitor', visitor_id=v['id']) }}">
+                  <button type="submit" class="btn-chip">
+                    <span class="material-icons-outlined btn-icon">logout</span>
+                    Check-out
+                  </button>
+                </form>
+              {% else %}
+                <span class="status-tag status-checkedout">Completed</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="8" class="empty-row">No visitor records yet.</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block modals %}
+<div class="modal" id="addVisitorModal">
+  <div class="modal-backdrop" data-close-modal></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Add visitor</h2>
+      <button class="icon-btn" data-close-modal>
+        <span class="material-icons-outlined">close</span>
+      </button>
+    </div>
+    <form class="modal-form" method="POST" action="{{ url_for('add_visitor') }}">
+      <div class="two-col">
+        <div class="form-group">
+          <label>Visitor name *</label>
+          <input type="text" name="name" required />
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" name="phone" />
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-group">
+          <label>Flat number *</label>
+          <input type="text" name="flat_no" required />
+        </div>
+        <div class="form-group">
+          <label>Vehicle no</label>
+          <input type="text" name="vehicle_no" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Purpose</label>
+        <input type="text" name="purpose" />
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+        <button type="submit" class="btn-primary">
+          <span class="material-icons-outlined btn-icon">check</span>
+          Save entry
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

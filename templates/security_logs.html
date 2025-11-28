@@ -1,0 +1,90 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header-row">
+  <div>
+    <h2 class="section-title">Security logs</h2>
+    <p class="hint-text">Who was on duty, when, and at which gate or tower.</p>
+  </div>
+  <button class="btn-primary" data-open-modal="addSecurityLogModal">
+    <span class="material-icons-outlined btn-icon">shield_moon</span>
+    Start shift
+  </button>
+</div>
+
+<div class="table-card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Guard</th>
+        <th>Shift start</th>
+        <th>Shift end</th>
+        <th>Notes</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if logs %}
+        {% for log in logs %}
+          <tr>
+            <td>{{ log["id"] }}</td>
+            <td>{{ log["guard_name"] }}</td>
+            <td>{{ log["shift_start"] }}</td>
+            <td>{{ log["shift_end"] or "-" }}</td>
+            <td>{{ log["notes"] or "-" }}</td>
+            <td>
+              {% if not log["shift_end"] %}
+                <form method="POST" action="{{ url_for('end_security_shift', log_id=log['id']) }}">
+                  <button type="submit" class="btn-chip">
+                    <span class="material-icons-outlined btn-icon">stop_circle</span>
+                    End shift
+                  </button>
+                </form>
+              {% else %}
+                <span class="status-tag status-checkedout">Closed</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="6" class="empty-row">No guard shifts logged yet.</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block modals %}
+<div class="modal" id="addSecurityLogModal">
+  <div class="modal-backdrop" data-close-modal></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Start guard shift</h2>
+      <button class="icon-btn" data-close-modal>
+        <span class="material-icons-outlined">close</span>
+      </button>
+    </div>
+    <form class="modal-form" method="POST" action="{{ url_for('add_security_log') }}">
+      <div class="form-group">
+        <label>Guard name *</label>
+        <input type="text" name="guard_name" required placeholder="Name on duty" />
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <input type="text" name="notes" placeholder="Gate number, tower, or remarks" />
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+        <button type="submit" class="btn-primary">
+          <span class="material-icons-outlined btn-icon">play_arrow</span>
+          Start shift
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

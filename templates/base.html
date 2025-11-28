@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ page_title if page_title else "Skyline Heights Residency" }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-mark">
+          <span class="material-icons-outlined">apartment</span>
+        </div>
+        <div class="logo-text">
+          <span class="logo-title">Skyline Heights</span>
+          <span class="logo-subtitle">Visitor Suite</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="{{ url_for('dashboard') }}" class="nav-item {% if request.path=='/' %}active{% endif %}">
+          <span class="material-icons-outlined nav-icon">dashboard</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+
+        <a href="{{ url_for('visitors_page') }}" class="nav-item {% if '/visitors' in request.path %}active{% endif %}">
+          <span class="material-icons-outlined nav-icon">badge</span>
+          <span class="nav-label">Visitors</span>
+        </a>
+
+        <a href="{{ url_for('security_logs') }}" class="nav-item {% if '/security-logs' in request.path %}active{% endif %}">
+          <span class="material-icons-outlined nav-icon">fact_check</span>
+          <span class="nav-label">Security Logs</span>
+        </a>
+
+        <a href="{{ url_for('residents') }}" class="nav-item {% if '/residents' in request.path %}active{% endif %}">
+          <span class="material-icons-outlined nav-icon">groups</span>
+          <span class="nav-label">Resident List</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        {% if session.get("username") %}
+          <span class="user-pill">
+            <span class="material-icons-outlined user-icon">person</span>
+            <span class="user-name">{{ session["username"] }}</span>
+          </span>
+          <a href="{{ url_for('logout') }}" class="logout-link">
+            <span class="material-icons-outlined logout-icon">logout</span>
+            Logout
+          </a>
+        {% endif %}
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-btn mobile-menu-toggle" id="mobileMenuToggle">
+            <span class="material-icons-outlined">menu</span>
+          </button>
+          <h1 class="page-title">{{ page_title if page_title else "Dashboard" }}</h1>
+        </div>
+        <div class="topbar-right">
+          <div class="pill-label">
+            <span class="dot-live"></span>
+            <span class="pill-text">Skyline Heights Residency</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="page-surface">
+        {% block content %}{% endblock %}
+      </section>
+    </main>
+  </div>
+
+  {% block modals %}{% endblock %}
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

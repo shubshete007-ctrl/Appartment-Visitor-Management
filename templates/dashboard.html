@@ -1,0 +1,183 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-card">
+  <div class="hero-text">
+    <p class="hero-kicker">Welcome to</p>
+    <h2 class="hero-title">{{ apartment_name }}</h2>
+    <p class="hero-subtitle">
+      A modern visitor & security log system for your residential community. Track visitors, residents,
+      and guard shifts with a clean, tablet-friendly interface.
+    </p>
+  </div>
+  <div class="hero-image-wrapper">
+    <img src="{{ hero_image_url }}" alt="Apartment building" class="hero-image" />
+  </div>
+</div>
+
+<div class="grid-3">
+  <div class="card card-metric">
+    <div class="card-header">
+      <div>
+        <p class="card-label">Today's visitors</p>
+        <p class="card-value">{{ daily_count }}</p>
+      </div>
+      <span class="material-icons-outlined card-icon">today</span>
+    </div>
+    <p class="card-footnote">Visitors checked in today</p>
+  </div>
+
+  <div class="card card-metric">
+    <div class="card-header">
+      <div>
+        <p class="card-label">Currently inside</p>
+        <p class="card-value">{{ inside_count }}</p>
+      </div>
+      <span class="material-icons-outlined card-icon">meeting_room</span>
+    </div>
+    <p class="card-footnote">Still inside the premises</p>
+  </div>
+
+  <div class="card card-metric">
+    <div class="card-header">
+      <div>
+        <p class="card-label">Registered residents</p>
+        <p class="card-value">{{ total_residents }}</p>
+      </div>
+      <span class="material-icons-outlined card-icon">groups</span>
+    </div>
+    <p class="card-footnote">Flats / members onboarded</p>
+  </div>
+</div>
+
+<div class="layout-split">
+  <div class="split-block">
+    <div class="split-header">
+      <h2 class="section-title">Recent visitors</h2>
+      <a href="{{ url_for('visitors_page') }}" class="link-muted">View all</a>
+    </div>
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Visitor</th>
+            <th>Flat</th>
+            <th>Check-in</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if recent %}
+            {% for row in recent %}
+              <tr>
+                <td>{{ row["name"] }}</td>
+                <td>{{ row["flat_no"] }}</td>
+                <td>{{ row["check_in"] }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="3" class="empty-row">No visitors logged yet.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="split-block">
+    <div class="split-header">
+      <h2 class="section-title">Quick actions</h2>
+    </div>
+    <div class="card stack-card">
+      <button class="btn-primary full-width" data-open-modal="addVisitorModal">
+        <span class="material-icons-outlined btn-icon">person_add</span>
+        New visitor entry
+      </button>
+      <button class="btn-ghost full-width" data-open-modal="addSecurityLogModal">
+        <span class="material-icons-outlined btn-icon">shield_moon</span>
+        Start guard shift
+      </button>
+      <p class="hint-text">Use these shortcuts during busy gate hours.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<!-- Add Visitor Modal -->
+<div class="modal" id="addVisitorModal">
+  <div class="modal-backdrop" data-close-modal></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Add visitor</h2>
+      <button class="icon-btn" data-close-modal>
+        <span class="material-icons-outlined">close</span>
+      </button>
+    </div>
+    <form class="modal-form" method="POST" action="{{ url_for('add_visitor') }}">
+      <div class="two-col">
+        <div class="form-group">
+          <label>Visitor name *</label>
+          <input type="text" name="name" required placeholder="Full name" />
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" name="phone" placeholder="Phone number" />
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-group">
+          <label>Flat number *</label>
+          <input type="text" name="flat_no" required placeholder="B-302" />
+        </div>
+        <div class="form-group">
+          <label>Vehicle no</label>
+          <input type="text" name="vehicle_no" placeholder="Optional" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Purpose</label>
+        <input type="text" name="purpose" placeholder="Courier / Guest / Maintenance..." />
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+        <button type="submit" class="btn-primary">
+          <span class="material-icons-outlined btn-icon">check</span>
+          Save entry
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Security Log Modal -->
+<div class="modal" id="addSecurityLogModal">
+  <div class="modal-backdrop" data-close-modal></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Start guard shift</h2>
+      <button class="icon-btn" data-close-modal>
+        <span class="material-icons-outlined">close</span>
+      </button>
+    </div>
+    <form class="modal-form" method="POST" action="{{ url_for('add_security_log') }}">
+      <div class="form-group">
+        <label>Guard name *</label>
+        <input type="text" name="guard_name" required placeholder="Name on duty" />
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <input type="text" name="notes" placeholder="Gate, tower, any remarks" />
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+        <button type="submit" class="btn-primary">
+          <span class="material-icons-outlined btn-icon">play_arrow</span>
+          Start shift
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
