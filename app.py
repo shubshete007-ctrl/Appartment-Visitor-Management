@@ -331,5 +331,4 @@ def end_security_shift(log_id):
     return redirect(url_for("security_logs"))
 
 if __name__ == "__main__":
-    init_db()
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=80, debug=False)
